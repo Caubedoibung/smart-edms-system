@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
     container_name: smartedms-postgres
     environment:
-      POSTGRES_DB: smartedms
-      POSTGRES_USER: smartedms
-      POSTGRES_PASSWORD: smartedms123
+      POSTGRES_DB: ${POSTGRES_DB:-smartedms}
+      POSTGRES_USER: ${POSTGRES_USER:-smartedms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartedms123}
     ports:
       - "5432:5432"
     volumes:
@@ -19,8 +17,8 @@ services:
     image: minio/minio:latest
     container_name: smartedms-minio
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
     ports:
       - "9000:9000"
       - "9001:9001"
