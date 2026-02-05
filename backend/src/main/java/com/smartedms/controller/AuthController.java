@@ -26,8 +26,10 @@ public class AuthController {
                         loginRequest.getUsername(),
                         loginRequest.getPassword()));
 
-        // 2. Nếu đúng Pass -> Sinh Token
-        String token = jwtUtils.generateToken(loginRequest.getUsername());
+        // 2. Nếu đúng Pass -> Sinh Token với roles từ Authentication
+        String token = jwtUtils.generateToken(
+                authentication.getName(),
+                authentication.getAuthorities());
 
         // 3. Trả về cho Client
         return ResponseEntity.ok(new AuthResponse(token, "Bearer"));
