@@ -15,8 +15,8 @@ import {
 
 // Floating particle component
 const FloatingParticle = ({ delay }: { delay: number }) => {
-    const randomX = Math.random() * 100;
-    const randomDuration = 20 + Math.random() * 20;
+    const [randomX] = useState(() => Math.random() * 100);
+    const [randomDuration] = useState(() => 20 + Math.random() * 20);
 
     return (
         <motion.div
