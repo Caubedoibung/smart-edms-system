@@ -103,8 +103,8 @@ export function Login() {
         // Simulate login delay
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        // Store auth state (in real app, this would be handled by auth system)
-        localStorage.setItem("isAuthenticated", "true");
+        // Store auth state for this session (in real app, this would be handled by auth system)
+        sessionStorage.setItem("isAuthenticated", "true");
 
         // Navigate to dashboard
         navigate("/dashboard");
