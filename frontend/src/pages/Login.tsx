@@ -24,15 +24,33 @@ export function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const resp = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: email, password }),
+      });
 
-    // Store auth state for this session
-    sessionStorage.setItem("isAuthenticated", "true");
+      if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(text || `Login failed: ${resp.status}`);
+      }
 
-    // Navigate to dashboard
-    navigate("/dashboard");
-    setIsLoading(false);
+      const data = await resp.json();
+      // Save token and auth flag
+      if (data && data.token) {
+        sessionStorage.setItem("authToken", data.token);
+        sessionStorage.setItem("isAuthenticated", "true");
+        navigate("/dashboard");
+      } else {
+        throw new Error("Invalid login response");
+      }
+    } catch (err: any) {
+      // Minimal error handling: show alert (can be replaced with UI feedback)
+      alert(err.message || "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
