@@ -23,7 +23,7 @@ public class AuthController {
         // 1. Xác thực User/Pass (Spring Security tự làm bước check DB)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
+                        loginRequest.getEmail(),
                         loginRequest.getPassword()));
 
         // 2. Nếu đúng Pass -> Sinh Token với roles từ Authentication
