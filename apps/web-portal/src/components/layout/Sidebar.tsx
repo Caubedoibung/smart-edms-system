@@ -131,45 +131,45 @@ export function Sidebar({ role, user, notifications }: SidebarProps) {
                                     initial={{ opacity: 0, x: -10, scale: 0.95 }}
                                     animate={{ opacity: 1, x: 0, scale: 1 }}
                                     exit={{ opacity: 0, x: -10, scale: 0.95 }}
-                                    className="absolute left-[calc(100%+16px)] top-0 mt-0 w-80 glass-panel rounded-2xl shadow-2xl border border-white/60 bg-white/95 overflow-visible z-[100]"
+                                    className="absolute left-[calc(100%+24px)] -top-24 w-80 glass-panel rounded-3xl shadow-2xl border border-white/60 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 overflow-visible z-[100]"
                                 >
-                                    {/* The Triangle Pointer */}
-                                    <div className="absolute top-3 -left-[10px] w-0 h-0 border-y-[10px] border-y-transparent border-r-[10px] border-r-white/90 drop-shadow-[-1px_0px_1px_rgba(255,255,255,0.8)]" />
+                                    {/* The Triangle Pointer - Centered vertically on the box side */}
+                                    <div className="absolute top-[108px] -left-[12px] w-0 h-0 border-y-[12px] border-y-transparent border-r-[12px] border-r-white/95 dark:border-r-slate-900/95 drop-shadow-[-2px_0px_2px_rgba(0,0,0,0.1)]" />
 
-                                    <div className="p-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-2xl relative z-10">
-                                        <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">Thông báo</h3>
+                                    <div className="p-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-50/50 dark:bg-white/5 rounded-t-3xl relative z-10">
+                                        <h3 className="font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-100">Thông báo</h3>
                                         <span className="text-[9px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{unreadCount} mới</span>
                                     </div>
-                                    <div className="max-h-[300px] overflow-y-auto scrollbar-hide relative z-10 bg-white/90 rounded-b-2xl">
+                                    <div className="max-h-[400px] overflow-y-auto scrollbar-hide relative z-10 bg-transparent rounded-b-3xl">
                                         {notifications.length === 0 ? (
-                                            <div className="p-6 text-center text-muted-foreground">
-                                                <Bell className="w-6 h-6 mx-auto opacity-20 mb-2" />
-                                                <p className="text-xs font-bold">Không có thông báo nào</p>
+                                            <div className="p-10 text-center text-muted-foreground">
+                                                <Bell className="w-8 h-8 mx-auto opacity-20 mb-3" />
+                                                <p className="text-xs font-bold dark:text-slate-400">Không có thông báo nào</p>
                                             </div>
                                         ) : (
                                             <div className="flex flex-col">
                                                 {notifications.map((notif, index) => (
                                                     <div key={notif.id} className={cn(
-                                                        "p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer group",
+                                                        "p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group",
                                                         index === notifications.length - 1 && "border-0"
                                                     )}>
                                                         <div className="flex gap-3">
                                                             <div className={cn(
-                                                                "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
-                                                                notif.type === 'info' ? "bg-blue-100 text-blue-600" :
-                                                                notif.type === 'warning' ? "bg-amber-100 text-amber-600" :
-                                                                notif.type === 'error' ? "bg-red-100 text-red-600" :
-                                                                "bg-green-100 text-green-600"
+                                                                "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
+                                                                notif.type === 'info' ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" :
+                                                                notif.type === 'warning' ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" :
+                                                                notif.type === 'error' ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" :
+                                                                "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
                                                             )}>
                                                                 {notif.type === 'warning' ? <AlertTriangle className="w-4 h-4" /> :
                                                                  notif.type === 'error' ? <AlertTriangle className="w-4 h-4" /> :
                                                                  notif.type === 'info' ? <Info className="w-4 h-4" /> :
                                                                  <CheckCircle className="w-4 h-4" />}
                                                             </div>
-                                                            <div>
-                                                                <p className="text-xs font-bold text-slate-800 group-hover:text-primary transition-colors">{notif.title}</p>
-                                                                <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">{notif.message}</p>
-                                                                <p className="text-[9px] font-black uppercase text-slate-400 mt-2">{notif.time}</p>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors">{notif.title}</p>
+                                                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">{notif.message}</p>
+                                                                <p className="text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 mt-2">{notif.time}</p>
                                                             </div>
                                                         </div>
                                                     </div>
