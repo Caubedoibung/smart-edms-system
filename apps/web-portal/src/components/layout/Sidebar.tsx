@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import type { UserRole } from "../../lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface SidebarProps {
@@ -34,6 +34,14 @@ export function Sidebar({ role, user, notifications }: SidebarProps) {
     const location = useLocation();
     const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
     const [showNotifications, setShowNotifications] = useState(false);
+
+    // Click outside to close notifications
+    useEffect(() => {
+        if (!showNotifications) return;
+        const handleClick = () => setShowNotifications(false);
+        window.addEventListener('click', handleClick);
+        return () => window.removeEventListener('click', handleClick);
+    }, [showNotifications]);
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -116,7 +124,7 @@ export function Sidebar({ role, user, notifications }: SidebarProps) {
                             {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
                         </button>
                         
-                        <div className="relative">
+                        <div className="relative" onClick={(e) => e.stopPropagation()}>
                             <button 
                                 onClick={() => setShowNotifications(!showNotifications)} 
                                 className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all shadow-sm"
@@ -170,7 +178,6 @@ export function Sidebar({ role, user, notifications }: SidebarProps) {
             {/* Navigation Scroll Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-8 scrollbar-hide">
                 <div className="space-y-1">
-                    <h2 className="px-3 mb-2 text-[10px] font-black text-muted-foreground/50 uppercase tracking-[0.2em]">Menu Chính</h2>
                     {NAV_GROUPS.COMMON.map(renderLink)}
                 </div>
 

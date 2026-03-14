@@ -146,7 +146,24 @@ export function FileExplorer({ title, currentFolderId, ownerId, user, onFolderCh
     const handleContextMenu = (e: React.MouseEvent, fileId: string) => {
         e.preventDefault();
         e.stopPropagation();
-        setContextMenu({ id: fileId, x: e.clientX, y: e.clientY });
+        
+        const menuWidth = 192; // 48 * 4 (w-48)
+        const menuHeight = 200; // Estimated height based on items
+        
+        let x = e.clientX;
+        let y = e.clientY;
+        
+        // Constrain X
+        if (x + menuWidth > window.innerWidth) {
+            x = window.innerWidth - menuWidth - 10;
+        }
+        
+        // Constrain Y
+        if (y + menuHeight > window.innerHeight) {
+            y = window.innerHeight - menuHeight - 10;
+        }
+        
+        setContextMenu({ id: fileId, x, y });
     };
 
     const handleCreateFolder = (e: React.FormEvent) => {
