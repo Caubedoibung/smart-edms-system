@@ -1,8 +1,10 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
+import { GooeyToaster } from "goey-toast";
+import "goey-toast/styles.css";
+
 import { Login } from "./pages/Login";
 import { MainLayout } from "./components/layout/MainLayout";
 // Import các trang cần thiết
-import { FileExplorer } from "./pages/FileExplorer";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 const router = createBrowserRouter([
     {
@@ -19,7 +21,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "files",
-                element: <FileExplorer />, // Dành riêng spotlight cho task EDMS-50
+                element: null, // Dành riêng spotlight cho task EDMS-50
             },
             {
                 path: "department",
@@ -62,6 +64,19 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <>
+            <RouterProvider router={router} />
+            <GooeyToaster 
+                position="bottom-right"
+                toastOptions={{
+                    className: "glass-panel bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(99,102,241,0.15)] font-bold",
+                    style: {
+                        borderRadius: "24px",
+                    }
+                }}
+            />
+        </>
+    );
 }
 export default App;

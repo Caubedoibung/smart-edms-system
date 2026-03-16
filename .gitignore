@@ -10,7 +10,7 @@ target/
 .settings/
 *.iml
 .idea/
-
+application.properties
 # Node / React
 node_modules/
 dist/

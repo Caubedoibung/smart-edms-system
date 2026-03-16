@@ -1,23 +1,40 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
 import type { UserRole } from "../../lib/types";
 import { FileExplorer } from "../../pages/FileExplorer";
 import { PlaceholderPage } from "../../pages/PlaceholderPage";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
-import { cn } from "../../lib/utils";
+
+export interface AppNotification {
+    id: string;
+    title: string;
+    message: string;
+    type: 'info' | 'warning' | 'error' | 'success';
+    time: string;
+    isRead: boolean;
+}
 
 export function MainLayout() {
-    const [currentRole, setCurrentRole] = useState<UserRole>('MANAGER');
-    const [isSidebarHovered, setIsSidebarHovered] = useState(false);
-    const [isHeaderHovered, setIsHeaderHovered] = useState(false);
-    
-    const location = useLocation();
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
+
+    // Initialize from localStorage
+    const [currentUser] = useState<any>(() => {
+        const stored = localStorage.getItem('user');
+        return stored ? JSON.parse(stored) : { id: "1", role: "MANAGER", name: "Mock User", email: "mock@mock.com", department: "IT", avatar: "", status: "active" }; // Fallback for dev mode
+    });
+
+    const currentRole: UserRole = currentUser?.role || 'STAFF';
     
     const currentFolderId = searchParams.get('folder');
-    const currentUser: any = ([] as any[]).find(u => u.role === currentRole) || ({ id: "1", role: "MANAGER", name: "Mock User", email: "mock@mock.com", department: "IT", avatar: "", status: "active" } as any);
+
+    // --- REAL NOTIFICATIONS SYSTEM ---
+    const [notifications] = useState<AppNotification[]>([
+        { id: '1', title: 'Tài liệu mới', message: 'Tài liệu "Quy_Trinh_Bao_Mat_2024.pdf" vừa được tải lên kho phòng ban.', type: 'info', time: 'Vừa xong', isRead: false },
+        { id: '2', title: 'Cần phê duyệt', message: 'Bạn có 3 hợp đồng đang chờ chữ ký số.', type: 'warning', time: '1 giờ trước', isRead: false },
+        { id: '3', title: 'Thành công', message: 'Tiến trình sao lưu dữ liệu hệ thống đã hoàn tất.', type: 'success', time: '2 giờ trước', isRead: true },
+    ]);
 
     // --- SECURITY: ADMIN CANNOT ACCESS PERSONAL FILES ---
     useEffect(() => {
@@ -64,41 +81,14 @@ export function MainLayout() {
     };
 
     return (
-        <div className="flex h-screen overflow-hidden selection:bg-primary/20 selection:text-primary transition-colors duration-300 bg-slate-50 dark:bg-slate-950">
+        <div className="flex h-screen overflow-hidden selection:bg-primary/20 selection:text-primary transition-colors duration-300 bg-slate-50 dark:bg-slate-950 relative">
             
-            {/* --- TRIGGER ZONES --- */}
-            <div 
-                className="fixed top-0 left-0 bottom-0 w-2 z-[60]" 
-                onMouseEnter={() => setIsSidebarHovered(true)}
-            />
-            <div 
-                className="fixed top-0 left-0 right-0 h-2 z-[60]" 
-                onMouseEnter={() => setIsHeaderHovered(true)}
-            />
+            {/* Sidebar is now always visible */}
+            <Sidebar role={currentRole} user={currentUser} notifications={notifications} />
 
-            {/* Sidebar with hover control */}
-            <div onMouseLeave={() => setIsSidebarHovered(false)} className="h-full">
-                <Sidebar role={currentRole} isHovered={isSidebarHovered} />
-            </div>
-
-            {/* Main Content with dynamic push */}
-            <div 
-                className="flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-500 ease-[0.23,1,0.32,1]"
-                style={{ 
-                    marginLeft: isSidebarHovered ? 'var(--sidebar-width)' : '0px',
-                    paddingTop: isHeaderHovered ? 'var(--header-height)' : '0px'
-                }}
-            >
-                <div onMouseLeave={() => setIsHeaderHovered(false)}>
-                    <Header 
-                        user={currentUser} 
-                        currentFolderId={currentFolderId}
-                        onBreadcrumbClick={handleFolderChange}
-                        isVisible={isHeaderHovered}
-                    />
-                </div>
-
-                <main className="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth relative z-10">
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                <main className="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth relative z-10 pt-8">
                     <div className="max-w-[1600px] mx-auto animate-in fade-in duration-1000">
                         {renderContent()}
                     </div>
