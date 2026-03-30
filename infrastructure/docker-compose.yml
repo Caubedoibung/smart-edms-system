@@ -1,0 +1,115 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: emds-microservices-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-smartedms}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartedms123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - smartedms-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: emds-microservices-minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - smartedms-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: emds-microservices-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: smartedms-audit
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - smartedms-network
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: emds-microservices-gotenberg
+    restart: always
+    ports:
+      - "3001:3000"
+    networks:
+      - smartedms-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: emds-api-gateway
+    restart: always
+    ports:
+      - "80:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - smartedms-network
+
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: emds-kafka
+    restart: always
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+    # Bỏ qua lưu trữ ổ cứng Volume tạm thời để né lỗi Checkpoint Permission cho Docker Windows!
+    # volumes:
+    #   - kafka_data:/tmp/kraft-combined-logs
+    networks:
+      - smartedms-network
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: emds-api-ngrok
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    # Lưu ý cực kỳ quan trọng: Trong Docker Compose, bạn KHÔNG ĐƯỢC để "http 80"
+    # Vì ngrok sẽ lấy cổng 80 của chính cái container ngrok!
+    # Phải gọi "http nginx:80" để ngrok trỏ luồng sang cái container Nginx kế bên.
+    command: "http nginx:80 --url=pseudoeconomical-loise-interpolable.ngrok-free.dev"
+    depends_on:
+      - nginx
+    networks:
+      - smartedms-network
+
+volumes:
+  postgres_data:
+  minio_data:
+  mongodb_data:
+  kafka_data:
+
+networks:
+  smartedms-network:
+    driver: bridge
